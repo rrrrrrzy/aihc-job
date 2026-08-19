@@ -1,0 +1,33 @@
+{
+  "_comment": "4×A800 (half a node). cpu=32/memory=128/sharedMemory=128 is exactly the shape 4-GPU jobs in this queue use. Every tunable key is documented in docs/template-reference.md. Submit: aihc-job submit -f examples/a800-4gpu.json --name <run-name>",
+  "name": "train-4gpu",
+  "framework": "pytorch",
+  "image": "{{AIHC_IMAGE}}",
+  "command": "bash -c 'cd {{AIHC_WORKDIR}}/REPLACE_ME && torchrun --standalone --nproc_per_node 4 train.py'",
+  "replicas": 1,
+  "gpu": "a800:4,cpu=32,memory=128,sharedMemory=128",
+  "enableRDMA": true,
+  "envs": {
+    "PYTHONUNBUFFERED": "1",
+    "CUDA_DEVICE_MAX_CONNECTIONS": "1",
+    "NCCL_DEBUG": "INFO",
+    "HF_ENDPOINT": "https://hf-mirror.com"
+  },
+  "datasources": [
+    {
+      "type": "cfs",
+      "name": "share",
+      "sourcePath": "/",
+      "mountPath": "/share",
+      "options": {
+        "cfsInstanceId": "{{AIHC_CFS_INSTANCE}}",
+        "cfsMountPoint": "{{AIHC_CFS_MOUNT}}"
+      }
+    }
+  ],
+  "priority": "high",
+  "retentionPeriod": "1d",
+  "labels": {
+    "owner": "{{AIHC_OWNER}}"
+  }
+}

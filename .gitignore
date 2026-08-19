@@ -1,0 +1,18 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# never commit credentials or local job configs
+.aihc/
+*.env
+.env
+!.env.example   # the template is meant to be shared; it holds no secrets
+
+# tenant-specific notes: pool/queue IDs, images, who shares the queues
+LOCAL.md

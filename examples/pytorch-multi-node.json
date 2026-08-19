@@ -1,0 +1,28 @@
+{
+  "name": "demo-multi-node",
+  "framework": "pytorch",
+  "image": "registry.baidubce.com/aihc-aiak/aiak-megatron:ubuntu20.04-cu11.8-torch1.14.0-py38_v1.2.7.12_release",
+  "command": "bash -c 'cd /mnt/cluster/code && torchrun --nnodes $PET_NNODES --nproc_per_node 8 --node_rank $RANK --master_addr $MASTER_ADDR --master_port $MASTER_PORT train.py --config configs/large.yaml'",
+  "replicas": 4,
+  "gpu": "a800:8,cpu=96,memory=1024,sharedMemory=128",
+  "enableRDMA": true,
+  "enableBccl": true,
+  "envs": {
+    "NCCL_DEBUG": "INFO",
+    "NCCL_IB_DISABLE": "0",
+    "CUDA_DEVICE_MAX_CONNECTIONS": "1",
+    "PYTHONUNBUFFERED": "1"
+  },
+  "datasources": [
+    {
+      "type": "pfs",
+      "name": "pfs-REPLACE_ME",
+      "sourcePath": "/",
+      "mountPath": "/mnt/cluster"
+    }
+  ],
+  "faultTolerance": true,
+  "faultToleranceArgs": "--enable-replace=true --enable-hang-detection=true --hang-detection-log-timeout-minutes=15 --hang-detection-startup-toleration-minutes=30 --hang-detection-stack-timeout-minutes=5 --max-num-of-unconditional-retry=2",
+  "priority": "high",
+  "retentionPeriod": "1d"
+}

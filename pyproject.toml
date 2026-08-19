@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aihc-job"
+version = "0.1.0"
+description = "Submit and manage Baidu AIHC (百舸) training jobs from the CLI or Python"
+requires-python = ">=3.10"
+dependencies = ["requests>=2.25"]
+
+[project.optional-dependencies]
+# YAML templates and reading the official CLI's ~/.aihc/config
+yaml = ["pyyaml>=6.0"]
+dev = ["pytest>=7", "pyyaml>=6.0"]
+
+[project.scripts]
+aihc-job = "aihc_job.cli:main"
+
+[tool.setuptools]
+packages = ["aihc_job"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

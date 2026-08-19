@@ -1,0 +1,33 @@
+{
+  "_comment": "8×A800 single node (a whole A800 node -- 8 cards/node). CPU/memory match what 8-GPU jobs in this queue actually request. Every tunable key is documented in docs/template-reference.md. Submit: aihc-job submit -f examples/a800-8gpu.json --name <run-name>",
+  "name": "train-8gpu",
+  "framework": "pytorch",
+  "image": "{{AIHC_IMAGE}}",
+  "command": "bash -c 'cd {{AIHC_WORKDIR}}/REPLACE_ME && torchrun --standalone --nproc_per_node 8 train.py'",
+  "replicas": 1,
+  "gpu": "a800:8,cpu=122,memory=1964,sharedMemory=256",
+  "enableRDMA": true,
+  "envs": {
+    "PYTHONUNBUFFERED": "1",
+    "CUDA_DEVICE_MAX_CONNECTIONS": "1",
+    "NCCL_DEBUG": "INFO",
+    "HF_ENDPOINT": "https://hf-mirror.com"
+  },
+  "datasources": [
+    {
+      "type": "cfs",
+      "name": "share",
+      "sourcePath": "/",
+      "mountPath": "/share",
+      "options": {
+        "cfsInstanceId": "{{AIHC_CFS_INSTANCE}}",
+        "cfsMountPoint": "{{AIHC_CFS_MOUNT}}"
+      }
+    }
+  ],
+  "priority": "high",
+  "retentionPeriod": "1d",
+  "labels": {
+    "owner": "{{AIHC_OWNER}}"
+  }
+}

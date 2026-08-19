@@ -1,0 +1,26 @@
+{
+  "_comment": "1-GPU probe: confirms the image pulls and /share (CFS) mounts at the same path as locally, before spending a real run. cfsInstanceId/cfsMountPoint are required by CreateJob even though DescribeJob reads them back blank.",
+  "name": "cfs-share-smoke",
+  "framework": "pytorch",
+  "image": "{{AIHC_IMAGE}}",
+  "command": "bash -c 'ls /share && df -hT /share && nvidia-smi && python -c \"import torch;print(torch.__version__, torch.cuda.device_count())\"'",
+  "replicas": 1,
+  "gpu": "a800:1,cpu=16,memory=128",
+  "envs": {
+    "PYTHONUNBUFFERED": "1"
+  },
+  "datasources": [
+    {
+      "type": "cfs",
+      "name": "share",
+      "sourcePath": "/",
+      "mountPath": "/share",
+      "options": {
+        "cfsInstanceId": "{{AIHC_CFS_INSTANCE}}",
+        "cfsMountPoint": "{{AIHC_CFS_MOUNT}}"
+      }
+    }
+  ],
+  "priority": "high",
+  "retentionPeriod": "1d"
+}

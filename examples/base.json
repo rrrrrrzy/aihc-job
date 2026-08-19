@@ -1,0 +1,24 @@
+{
+  "_comment": "Merge base, not a standalone template: `aihc-job submit -f examples/base.json -f my-exp.json`. Later files and CLI flags override these.",
+  "image": "{{AIHC_IMAGE}}",
+  "gpu": "a800:8,cpu=122,memory=1964,sharedMemory=256",
+  "enableRDMA": true,
+  "envs": {
+    "PYTHONUNBUFFERED": "1",
+    "CUDA_DEVICE_MAX_CONNECTIONS": "1"
+  },
+  "priority": "high",
+  "retentionPeriod": "1d",
+  "datasources": [
+    {
+      "type": "cfs",
+      "name": "share",
+      "sourcePath": "/",
+      "mountPath": "/share",
+      "options": {
+        "cfsInstanceId": "{{AIHC_CFS_INSTANCE}}",
+        "cfsMountPoint": "{{AIHC_CFS_MOUNT}}"
+      }
+    }
+  ]
+}

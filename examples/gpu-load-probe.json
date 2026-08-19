@@ -1,0 +1,26 @@
+{
+  "_comment": "1-GPU job that deliberately burns the GPU for ~4 minutes, so `aihc-job watch <jobId>` has real load to show. Used to verify the monitoring path end to end without spending a training run.",
+  "name": "gpu-load-probe",
+  "framework": "pytorch",
+  "image": "{{AIHC_IMAGE}}",
+  "command": "python -c \"import torch,time;print(torch.__version__, torch.cuda.get_device_name(0), flush=True);a=torch.randn(12288,12288,device='cuda',dtype=torch.bfloat16);t=time.time();n=0\nwhile time.time()-t<240:\n    a=(a@a)/128; n+=1\ntorch.cuda.synchronize();print('matmuls', n, flush=True)\"",
+  "replicas": 1,
+  "gpu": "a800:1,cpu=16,memory=128",
+  "envs": {
+    "PYTHONUNBUFFERED": "1"
+  },
+  "datasources": [
+    {
+      "type": "cfs",
+      "name": "share",
+      "sourcePath": "/",
+      "mountPath": "/share",
+      "options": {
+        "cfsInstanceId": "{{AIHC_CFS_INSTANCE}}",
+        "cfsMountPoint": "{{AIHC_CFS_MOUNT}}"
+      }
+    }
+  ],
+  "priority": "high",
+  "retentionPeriod": "1d"
+}
