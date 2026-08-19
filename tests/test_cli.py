@@ -491,3 +491,24 @@ def test_sparkline_scales_percentages_against_100_not_the_maximum():
     assert cli._sparkline([1.0, 2.0, 3.0], ceiling=100.0) == "▁▁▁"
     assert cli._sparkline([0.0, 50.0, 100.0], ceiling=100.0) == "▁▅█"
     assert cli._sparkline([]) == ""
+
+
+def test_submit_json_follow_keeps_stdout_to_one_document(monkeypatch, capsys):
+    """--json promises a single document on stdout, so streamed logs go to stderr."""
+    from tests.test_client_jobs import _job_detail
+
+    code, _ = run(
+        ["--json", "submit", "--name", "demo", "--image", "r/x:1", "--command", "c",
+         "--follow", "--poll-interval", "0"],
+        monkeypatch,
+        FakeResponse(200, {"jobId": "job-1", "jobName": "demo"}),   # CreateJob
+        FakeResponse(200, _job_detail("Running")),                   # wait --until running
+        FakeResponse(200, _job_detail("Running")),                   # default_pod lookup
+        FakeResponse(200, {"logs": ["step 1 loss 0.5"], "nextMarker": ""}),
+        FakeResponse(200, _job_detail("Succeeded", finishedAt="2026-08-19T05:41:14Z")),
+        FakeResponse(200, _job_detail("Succeeded", finishedAt="2026-08-19T05:41:14Z")),
+    )
+    captured = capsys.readouterr()
+    assert code == cli.EXIT_OK
+    assert json.loads(captured.out)["status"] == "Succeeded"  # exactly one document
+    assert "step 1 loss 0.5" in captured.err

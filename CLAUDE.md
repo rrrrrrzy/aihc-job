@@ -10,6 +10,17 @@ through this tool. It speaks the 百舸 OpenAPI v2 directly and deliberately doe
 depend on `bce-python-sdk` or the official `aihc` binary — `requests` is the only
 runtime dependency (PyYAML optional, for YAML templates).
 
+Three docs, three audiences — keep them that way when editing:
+
+| File | For | Contains |
+|---|---|---|
+| `README.md` | humans using the tool | install, `.env`, submit, watch, manage, handover |
+| `README.agent.md` | agents/scripts driving it | exit codes, `--json` shapes, recipes, hard rules |
+| `CLAUDE.md` (this) | anyone changing the code | architecture, invariants, testing approach |
+
+`README.agent.md` documents a contract (exit codes, JSON shapes, offline guarantees).
+Changing behaviour it describes means updating it in the same commit.
+
 ## Commands
 
 ```bash

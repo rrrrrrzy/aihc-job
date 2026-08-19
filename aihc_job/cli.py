@@ -776,7 +776,9 @@ def cmd_submit(args: argparse.Namespace, manager: JobManager) -> int:
             raise_on_failure=False,
         )
         for line in manager.iter_logs(job_id, follow=True, timeout=args.wait_timeout):
-            print(_clean_log_line(line), flush=True)
+            # With --json this command still owes stdout exactly one document at the end,
+            # so the streamed lines go to stderr instead of interleaving with it.
+            print(_clean_log_line(line), file=sys.stderr if args.json else sys.stdout, flush=True)
     detail = manager.wait(
         job_id,
         until="running" if (args.wait_running and not args.wait) else "terminal",
